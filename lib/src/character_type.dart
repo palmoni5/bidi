@@ -4222,6 +4222,14 @@ const characterTypes = <int, CharacterType>{
   11840: CharacterType.otherNeutrals,
   11841: CharacterType.otherNeutrals,
   11842: CharacterType.otherNeutrals,
+  11861: CharacterType.otherNeutrals,
+  11862: CharacterType.otherNeutrals,
+  11863: CharacterType.otherNeutrals,
+  11864: CharacterType.otherNeutrals,
+  11865: CharacterType.otherNeutrals,
+  11866: CharacterType.otherNeutrals,
+  11867: CharacterType.otherNeutrals,
+  11868: CharacterType.otherNeutrals,
   11904: CharacterType.otherNeutrals,
   11905: CharacterType.otherNeutrals,
   11906: CharacterType.otherNeutrals,
@@ -5932,5 +5940,18 @@ const characterTypes = <int, CharacterType>{
 ///
 /// Returns the character bidi [CharacterType].
 CharacterType getCharacterType(int character) {
+  // ASCII accounts for many punctuation, number, and Latin runs in printed
+  // Hebrew/English documents. A dense array avoids a large-map lookup.
+  if (character >= 0 && character < 0x80) {
+    return _asciiBidiTypes[character];
+  }
+  // All 27 base Hebrew letters share the R class (the vowel/mark range
+  // below U+05D0 still uses the regular Unicode lookup).
+  if (character >= 0x05D0 && character <= 0x05EA) {
+    return CharacterType.rtl;
+  }
+  if (character > 0xFFFF && character <= 0x10FFFF) {
+    return _getSupplementaryCharacterType(character);
+  }
   return characterTypes[character] ?? CharacterType.ltr;
 }
